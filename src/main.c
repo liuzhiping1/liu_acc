@@ -55,7 +55,8 @@ int main(int argc ,char**argv)
 {
 
         char*arry;
-	static unsigned char hi,lo,temp=0,sum=0;
+	static unsigned int temp=0,sum=0;
+	static unsigned char hi,lo;
 
 	printf("argv=%s\n",*(argv+1));
 
@@ -75,7 +76,7 @@ int main(int argc ,char**argv)
 	}
 	else
 	    printf("no args!!!\n");
-	printf("sum=%02x\n",sum);
+	printf("sum=%x\n",sum);
 
 }
 
