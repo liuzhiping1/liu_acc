@@ -81,23 +81,20 @@ int is_hex_char( char w)
 		sum += temp;
 		//printf("temp=%d,sum=%x",temp,sum);
 	}
-	printf("sum=%x\n",sum);
+	printf("sum=%04x\n",sum);
  }
  void acc_file(char *filename)
  {
 	int fd,j;
 	long crc=0;
-	char *buf;
-	unsigned char temp,hi,lo;
-	int num,i=0;
+	char *buf,*temp_buf;
+	unsigned char temp,hi=0,lo=0;
 	struct stat sb;
 	if (stat(filename, &sb) == -1) {
 	   perror("stat");
 	   exit(EXIT_FAILURE);
 	}
-
 	printf("File type:                ");
-
 	switch (sb.st_mode & S_IFMT) {
 	case S_IFBLK:  printf("block device\n");            break;
 	case S_IFCHR:  printf("character device\n");        break;
@@ -110,25 +107,31 @@ int is_hex_char( char w)
 	}
 	fd = open(filename,O_RDONLY);
 	buf = (char *)malloc(sb.st_size);
+	temp_buf = buf;
 	read(fd,buf,sb.st_size);
-	acc_string(buf);
-/* 	while(num = read(fd,buf,512))
+	for(j=0;j<sb.st_size;j++)
 	{
-		//acc
-		for(j=0;j<num;)
+		//get two hex_char
+		if(is_hex_char(buf[j]))
 		{
-			if(is_hex_char(buf[j++]))
+			if(!hi)
+				hi = buf[j];
+			else
 			{
-				continue;
+				lo = buf[j];
 			}
+		}
+		//calculate crc
+		if(lo)
+		{
 			deal(&hi);
 			deal(&lo);
 			temp = (hi<<4)+(lo&0x0f);
-			crc+=temp;
-		}	
-		lseek(fd, num, i);
-		i +=num;
-	} */
+			crc += temp;
+			hi=0;lo=0;
+		}
+	}
+	printf("crc=%04x\n",(unsigned int)crc);
 	free(buf);
 	close(fd);
  }
